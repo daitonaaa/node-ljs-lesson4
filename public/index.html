@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Welcome to chat</title>
+</head>
+<style>
+
+  .enter-input {
+    margin-bottom: 15px;
+  }
+
+  input {
+    padding: 7.5px;
+    border-radius: 4px;
+    border: 2px solid slategrey;
+    min-width: 250px;
+  }
+
+  input:focus {
+    outline: none;
+    border: 2px solid cornflowerblue;
+  }
+
+</style>
+<body>
+
+  <h2>Welcome to chat</h2>
+
+  <div class="enter-input">
+    <input id="enter" type="text" placeholder="Enter message">
+  </div>
+
+  <ul id="messages"></ul>
+
+  <script>
+
+    window.onload = function () {
+      const input = document.getElementById('enter');
+
+      const publishMessage = (message) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/publish', true);
+
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
+        xhr.send(JSON.stringify({ message }));
+      };
+
+      const subscribe = function () {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/subscribe', true);
+
+        xhr.onload = function() {
+          if (xhr.status !== 200) return this.onerror();
+
+          const li = document.createElement('li');
+          li.textContent = this.responseText;
+          messages.appendChild(li);
+
+          subscribe();
+        };
+
+        xhr.onerror = xhr.onabort = function() {
+          setTimeout(subscribe, 500);
+        };
+
+        xhr.send();
+      };
+
+      input.addEventListener('keyup', ({ key }) => {
+        if (key === 'Enter' && input.value.length >= 1) {
+          publishMessage(input.value);
+          input.value = '';
+        }
+      });
+
+      subscribe();
+    }
+
+  </script>
+
+</body>
+</html>
