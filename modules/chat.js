@@ -21,7 +21,7 @@ const moduleChat = {
 
             body = JSON.parse(body);
           } catch {
-            resolve({status: 404, body: `Bad request ${body}`});
+            resolve({status: 400, body: `Bad request ${body}`});
           }
 
           if (Array.isArray(clients) && clients.length > 0) {
